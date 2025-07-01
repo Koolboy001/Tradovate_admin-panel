@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transactions - Tradovate Admin</title>
+    <style>
+         :root {
+            --main-color: #00ffb7;
+            --bg-dark: #0e0e0e;
+            --bg-light: #ffffff;
+            --text-dark: #ffffff;
+            --text-light: #000000;
+            --card-dark: #1e1e1e;
+            --card-light: #f1f1f1;
+            --nav-width: 220px;
+            --nav-collapsed-width: 70px;
+            --transition-speed: 0.3s;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Navigation */
+        
+        nav {
+            width: var(--nav-width);
+            background-color: var(--card-dark);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            transition: width var(--transition-speed);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        nav.collapsed {
+            width: var(--nav-collapsed-width);
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--main-color);
+            margin-bottom: 2rem;
+            white-space: nowrap;
+            transition: opacity var(--transition-speed);
+        }
+        
+        nav.collapsed .logo {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        nav .logo-icon {
+            display: none;
+            font-size: 1.8rem;
+            color: var(--main-color);
+            margin-bottom: 2rem;
+        }
+        
+        nav.collapsed .logo-icon {
+            display: block;
+        }
+        
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        nav ul li {
+            margin-bottom: 1rem;
+            white-space: nowrap;
+        }
+        
+        nav ul li a {
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 5px;
+            transition: all var(--transition-speed);
+        }
+        
+        nav ul li a:hover {
+            background-color: var(--main-color);
+            color: #000;
+        }
+        
+        nav ul li a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+        
+        nav.collapsed ul li a span {
+            opacity: 0;
+            width: 0;
+            transition: opacity var(--transition-speed), width var(--transition-speed);
+        }
+        /* Main Content */
+        
+        .main {
+            margin-left: var(--nav-width);
+            width: calc(100% - var(--nav-width));
+            transition: margin-left var(--transition-speed);
+            padding-bottom: 2rem;
+        }
+        
+        .main.expanded {
+            margin-left: var(--nav-collapsed-width);
+        }
+        /* Header */
+        
+        header {
+            background-color: var(--card-dark);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .toggle-nav {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .toggle-mode {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            background-color: var(--main-color);
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            font-weight: bold;
+            transition: all var(--transition-speed);
+        }
+        
+        .toggle-mode:hover {
+            transform: scale(1.05);
+        }
+        /* Content */
+        
+        .content {
+            padding: 1.5rem;
+        }
+        /* Table */
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+            background-color: var(--card-dark);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 183, 0.1);
+            transition: background-color var(--transition-speed);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background-color: rgba(0, 255, 183, 0.1);
+            color: var(--main-color);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: rgba(0, 255, 183, 0.05);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status.completed {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .status.pending {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .status.failed {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        .amount {
+            font-weight: bold;
+        }
+        
+        .amount.credit {
+            color: #28a745;
+        }
+        
+        .amount.debit {
+            color: #dc3545;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--main-color);
+            cursor: pointer;
+            margin: 0 0.3rem;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.2);
+        }
+        /* Search and Filter */
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            transition: background-color var(--transition-speed);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--main-color);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group select {
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            min-width: 150px;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .export-btn {
+            background-color: var(--main-color);
+            color: #000;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+        /* Date Range Picker */
+        
+        .date-range {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .date-range input {
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: none;
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            transition: background-color var(--transition-speed);
+        }
+        /* Summary Cards */
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-card {
+            background-color: var(--card-dark);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 183, 0.1);
+            transition: all var(--transition-speed);
+        }
+        
+        .summary-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--main-color);
+            font-size: 1rem;
+        }
+        
+        .summary-card p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        /* Pagination */
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            background-color: var(--card-dark);
+            color: var(--text-dark);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .page-btn.active {
+            background-color: var(--main-color);
+            color: #000;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background-color: rgba(0, 255, 183, 0.1);
+        }
+        /* Modal */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--card-dark);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 255, 183, 0.2);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--main-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--main-color);
+            border-bottom: 1px solid rgba(0, 255, 183, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .modal-body {
+            margin: 1.5rem 0;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .modal-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn-primary {
+            background-color: var(--main-color);
+            color: #000;
+        }
+        
+        .modal-btn-secondary {
+            background-color: transparent;
+            color: var(--text-dark);
+            border: 1px solid var(--text-dark);
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .receipt-content {
+            background-color: var(--bg-dark);
+            padding: 1.5rem;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .receipt-row.total {
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+        /* Mobile Menu Button */
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--main-color);
+            color: #000;
+            border: none;
+            font-size: 1.5rem;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        /* Responsive Design */
+        
+        @media (max-width: 992px) {
+            nav {
+                width: var(--nav-collapsed-width);
+            }
+            nav .logo {
+                opacity: 0;
+            }
+            nav .logo-icon {
+                display: block;
+            }
+            nav ul li a span {
+                opacity: 0;
+                width: 0;
+            }
+            .main {
+                margin-left: var(--nav-collapsed-width);
+            }
+            .toggle-nav {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .summary-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            nav {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+            nav.open {
+                transform: translateX(0);
+            }
+            nav .logo {
+                opacity: 1;
+            }
+            nav ul li a span {
+                opacity: 1;
+                width: auto;
+            }
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-left {
+                margin-bottom: 1rem;
+            }
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            th,
+            td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            .action-btn {
+                margin: 0 0.1rem;
+                font-size: 0.9rem;
+            }
+            .date-range {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+            }
+            .date-range input {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+
+<body>
+    <nav id="sidebar">
+        <div class="logo">Tradovate</div>
+        <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+        <ul>
+            <li>
+                <a href="dashboard.html">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="users.html">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="deposit.html">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Deposit</span>
+                </a>
+            </li>
+            <li>
+                <a href="withdrawal.html">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Withdrawals</span>
+                </a>
+            </li>
+            <li>
+                <a href="transactions.html" class="active">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
+            <li>
+                <a href="packages.html">
+                    <i class="fas fa-box-open"></i>
+                    <span>Packages</span>
+                </a>
+            </li>
+            <li>
+                <a href="logs.html">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Logs</span>
+                </a>
+            </li>
+            <li>
+                <a href="settings.html">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="admins.html">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admins</span>
+                </a>
+            </li>
+            <li>
+                <a href="support.html">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="main" id="main">
+        <header>
+            <div class="header-left">
+                <button class="toggle-nav" id="toggleNav">
+          <i class="fas fa-bars"></i>
+        </button>
+                <h2>Transactions</h2>
+            </div>
+            <button class="toggle-mode" onclick="toggleMode()">
+        <i class="fas fa-moon"></i> Dark Mode
+      </button>
+        </header>
+
+        <div class="content">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total Transactions</h3>
+                    <p>$1,245,000</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Completed</h3>
+                    <p>$1,100,000</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Pending</h3>
+                    <p>$120,000</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Failed</h3>
+                    <p>$25,000</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search transactions..." id="searchInput">
+                </div>
+                <div class="filter-group">
+                    <div class="date-range">
+                        <input type="date" id="start-date">
+                        <span>to</span>
+                        <input type="date" id="end-date">
+                    </div>
+                    <select id="typeFilter">
+                        <option value="all">All Types</option>
+                        <option value="deposit">Deposit</option>
+                        <option value="withdrawal">Withdrawal</option>
+                        <option value="transfer">Transfer</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="all">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                    <button class="export-btn" id="exportBtn">
+                        <i class="fas fa-file-export"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="id">ID</th>
+                            <th data-sort="user">User</th>
+                            <th data-sort="type">Type</th>
+                            <th data-sort="amount">Amount</th>
+                            <th data-sort="date">Date</th>
+                            <th data-sort="status">Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <tr data-id="TXN1001" data-type="deposit" data-status="completed" data-date="2023-12-01 14:30" data-amount="50000">
+                            <td>#TXN1001</td>
+                            <td>John Doe</td>
+                            <td>Deposit</td>
+                            <td class="amount credit">+$50,000</td>
+                            <td>2023-12-01 14:30</td>
+                            <td><span class="status completed">Completed</span></td>
+                            <td>
+                                <button class="action-btn view-btn" title="View" data-id="TXN1001"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn receipt-btn" title="Receipt" data-id="TXN1001"><i class="fas fa-receipt"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-id="TXN1002" data-type="withdrawal" data-status="pending" data-date="2023-12-02 10:15" data-amount="25000">
+                            <td>#TXN1002</td>
+                            <td>Jane Smith</td>
+                            <td>Withdrawal</td>
+                            <td class="amount debit">-$25,000</td>
+                            <td>2023-12-02 10:15</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td>
+                                <button class="action-btn view-btn" title="View" data-id="TXN1002"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn approve-btn" title="Approve" data-id="TXN1002"><i class="fas fa-check"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-id="TXN1003" data-type="transfer" data-status="completed" data-date="2023-12-03 16:45" data-amount="10000">
+                            <td>#TXN1003</td>
+                            <td>Michael Johnson</td>
+                            <td>Transfer</td>
+                            <td class="amount debit">-$10,000</td>
+                            <td>2023-12-03 16:45</td>
+                            <td><span class="status completed">Completed</span></td>
+                            <td>
+                                <button class="action-btn view-btn" title="View" data-id="TXN1003"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn receipt-btn" title="Receipt" data-id="TXN1003"><i class="fas fa-receipt"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-id="TXN1004" data-type="deposit" data-status="completed" data-date="2023-12-04 09:20" data-amount="75000">
+                            <td>#TXN1004</td>
+                            <td>Sarah Williams</td>
+                            <td>Deposit</td>
+                            <td class="amount credit">+$75,000</td>
+                            <td>2023-12-04 09:20</td>
+                            <td><span class="status completed">Completed</span></td>
+                            <td>
+                                <button class="action-btn view-btn" title="View" data-id="TXN1004"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn receipt-btn" title="Receipt" data-id="TXN1004"><i class="fas fa-receipt"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-id="TXN1005" data-type="withdrawal" data-status="failed" data-date="2023-12-05 11:30" data-amount="15000">
+                            <td>#TXN1005</td>
+                            <td>David Brown</td>
+                            <td>Withdrawal</td>
+                            <td class="amount debit">-$15,000</td>
+                            <td>2023-12-05 11:30</td>
+                            <td><span class="status failed">Failed</span></td>
+                            <td>
+                                <button class="action-btn view-btn" title="View" data-id="TXN1005"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn retry-btn" title="Retry" data-id="TXN1005"><i class="fas fa-redo"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn" id="prevPage"><i class="fas fa-angle-left"></i></button>
+                <button class="page-btn active" data-page="1">1</button>
+                <button class="page-btn" data-page="2">2</button>
+                <button class="page-btn" data-page="3">3</button>
+                <button class="page-btn" id="nextPage"><i class="fas fa-angle-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeViewModal">&times;</button>
+            <h3 class="modal-title">Transaction Details</h3>
+            <div class="modal-body" id="viewModalBody">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="closeViewModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="receiptModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeReceiptModal">&times;</button>
+            <h3 class="modal-title">Transaction Receipt</h3>
+            <div class="modal-body">
+                <div class="receipt-content" id="receiptContent">
+                    <!-- Receipt content will be dynamically inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-primary" id="printReceiptBtn">Print</button>
+                <button class="modal-btn modal-btn-secondary" id="closeReceiptBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="approveModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeApproveModal">&times;</button>
+            <h3 class="modal-title">Approve Transaction</h3>
+            <div class="modal-body">
+                <p>Are you sure you want to approve this transaction?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="cancelApproveBtn">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="confirmApproveBtn">Approve</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="retryModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeRetryModal">&times;</button>
+            <h3 class="modal-title">Retry Failed Transaction</h3>
+            <div class="modal-body">
+                <p>Are you sure you want to retry this failed transaction?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="cancelRetryBtn">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="confirmRetryBtn">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeExportModal">&times;</button>
+            <h3 class="modal-title">Export Transactions</h3>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="exportFormat">Format</label>
+                    <select id="exportFormat">
+                        <option value="csv">CSV</option>
+                        <option value="excel">Excel</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exportColumns">Columns</label>
+                    <select id="exportColumns" multiple>
+                        <option value="id" selected>ID</option>
+                        <option value="user" selected>User</option>
+                        <option value="type" selected>Type</option>
+                        <option value="amount" selected>Amount</option>
+                        <option value="date" selected>Date</option>
+                        <option value="status" selected>Status</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" id="cancelExportBtn">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="confirmExportBtn">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+    <script>
+        // Dark/Light Mode Toggle
+        let darkMode = true;
+
+        function toggleMode() {
+            darkMode = !darkMode;
+            document.body.style.backgroundColor = darkMode ? 'var(--bg-dark)' : 'var(--bg-light)';
+            document.body.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
+
+            document.querySelectorAll('nav, .card, header, .table-container, .search-box input, .filter-group select, .date-range input, .summary-card').forEach(el => {
+                el.style.backgroundColor = darkMode ? 'var(--card-dark)' : 'var(--card-light)';
+                el.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
+            });
+
+            document.querySelectorAll('nav ul li a').forEach(link => {
+                link.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
+            });
+
+            const modeIcon = document.querySelector('.toggle-mode i');
+            const modeText = document.querySelector('.toggle-mode');
+
+            if (darkMode) {
+                modeIcon.className = 'fas fa-moon';
+                modeText.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            } else {
+                modeIcon.className = 'fas fa-sun';
+                modeText.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            }
+        }
+
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const toggleNav = document.getElementById('toggleNav');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+        }
+
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('open');
+        }
+
+        toggleNav.addEventListener('click', toggleSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Auto-collapse sidebar on mobile
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                main.classList.remove('expanded');
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Run on initial load
+
+        // Set default dates
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        document.getElementById('start-date').valueAsDate = sevenDaysAgo;
+        document.getElementById('end-date').valueAsDate = today;
+
+        // Sample transaction data (in a real app, this would come from a database)
+        const transactions = {
+            'TXN1001': {
+                id: 'TXN1001',
+                user: 'John Doe',
+                type: 'deposit',
+                amount: 50000,
+                date: '2023-12-01 14:30',
+                status: 'completed',
+                method: 'Bank Transfer',
+                reference: 'REF123456789',
+                description: 'Initial investment deposit'
+            },
+            'TXN1002': {
+                id: 'TXN1002',
+                user: 'Jane Smith',
+                type: 'withdrawal',
+                amount: 25000,
+                date: '2023-12-02 10:15',
+                status: 'pending',
+                method: 'Bank Transfer',
+                reference: 'REF987654321',
+                description: 'Profit withdrawal request'
+            },
+            'TXN1003': {
+                id: 'TXN1003',
+                user: 'Michael Johnson',
+                type: 'transfer',
+                amount: 10000,
+                date: '2023-12-03 16:45',
+                status: 'completed',
+                method: 'Internal Transfer',
+                reference: 'REF456123789',
+                description: 'Transfer to trading account'
+            },
+            'TXN1004': {
+                id: 'TXN1004',
+                user: 'Sarah Williams',
+                type: 'deposit',
+                amount: 75000,
+                date: '2023-12-04 09:20',
+                status: 'completed',
+                method: 'Credit Card',
+                reference: 'REF789123456',
+                description: 'Additional investment'
+            },
+            'TXN1005': {
+                id: 'TXN1005',
+                user: 'David Brown',
+                type: 'withdrawal',
+                amount: 15000,
+                date: '2023-12-05 11:30',
+                status: 'failed',
+                method: 'Bank Transfer',
+                reference: 'REF321654987',
+                description: 'Withdrawal request',
+                failureReason: 'Insufficient funds'
+            }
+        };
+
+        let currentTransactionId = null;
+
+        // Modal elements
+        const viewModal = document.getElementById('viewModal');
+        const receiptModal = document.getElementById('receiptModal');
+        const approveModal = document.getElementById('approveModal');
+        const retryModal = document.getElementById('retryModal');
+        const exportModal = document.getElementById('exportModal');
+
+        // Close buttons
+        const closeViewModal = document.getElementById('closeViewModal');
+        const closeReceiptModal = document.getElementById('closeReceiptModal');
+        const closeApproveModal = document.getElementById('closeApproveModal');
+        const closeRetryModal = document.getElementById('closeRetryModal');
+        const closeExportModal = document.getElementById('closeExportModal');
+
+        // Action buttons
+        const closeViewModalBtn = document.getElementById('closeViewModalBtn');
+        const closeReceiptBtn = document.getElementById('closeReceiptBtn');
+        const printReceiptBtn = document.getElementById('printReceiptBtn');
+        const cancelApproveBtn = document.getElementById('cancelApproveBtn');
+        const confirmApproveBtn = document.getElementById('confirmApproveBtn');
+        const cancelRetryBtn = document.getElementById('cancelRetryBtn');
+        const confirmRetryBtn = document.getElementById('confirmRetryBtn');
+        const cancelExportBtn = document.getElementById('cancelExportBtn');
+        const confirmExportBtn = document.getElementById('confirmExportBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // View Transaction
+        document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                                const transactionId = this.getAttribute('data-id');
+                                currentTransactionId = transactionId;
+                                const transaction = transactions[transactionId];
+
+                                const viewModalBody = document.getElementById('viewModalBody');
+                                viewModalBody.innerHTML = `
+                    <p><strong>Transaction ID:</strong> ${transaction.id}</p>
+                    <p><strong>User:</strong> ${transaction.user}</p>
+                    <p><strong>Type:</strong> ${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</p>
+                    <p><strong>Amount:</strong> <span class="${transaction.type === 'deposit' ? 'amount credit' : 'amount debit'}">${transaction.type === 'deposit' ? '+' : '-'}$${transaction.amount.toLocaleString()}</span></p>
+                    <p><strong>Date:</strong> ${transaction.date}</p>
+                    <p><strong>Status:</strong> <span class="status ${transaction.status}">${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}</span></p>
+                    <p><strong>Method:</strong> ${transaction.method}</p>
+                    <p><strong>Reference:</strong> ${transaction.reference}</p>
+                    <p><strong>Description:</strong> ${transaction.description}</p>
+                    ${transaction.status === 'failed' ? `<p><strong>Failure Reason:</strong> ${transaction.failureReason}</p>` : ''}
+                `;
+                
+                viewModal.style.display = 'flex';
+            });
+        });
+
+        // View Receipt
+        document.querySelectorAll('.receipt-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const transactionId = this.getAttribute('data-id');
+                currentTransactionId = transactionId;
+                const transaction = transactions[transactionId];
+                
+                const receiptContent = document.getElementById('receiptContent');
+                receiptContent.innerHTML = `
+                    <div class="receipt-row">
+                        <span>Receipt #:</span>
+                        <span>${transaction.id}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Date:</span>
+                        <span>${transaction.date}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>User:</span>
+                        <span>${transaction.user}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Type:</span>
+                        <span>${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Method:</span>
+                        <span>${transaction.method}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Reference:</span>
+                        <span>${transaction.reference}</span>
+                    </div>
+                    <div class="receipt-row total">
+                        <span>Amount:</span>
+                        <span class="${transaction.type === 'deposit' ? 'amount credit' : 'amount debit'}">${transaction.type === 'deposit' ? '+' : '-'}$${transaction.amount.toLocaleString()}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Status:</span>
+                        <span class="status ${transaction.status}">${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}</span>
+                    </div>
+                `;
+                
+                receiptModal.style.display = 'flex';
+            });
+        });
+
+        // Approve Transaction
+        document.querySelectorAll('.approve-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentTransactionId = this.getAttribute('data-id');
+                approveModal.style.display = 'flex';
+            });
+        });
+
+        // Retry Transaction
+        document.querySelectorAll('.retry-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentTransactionId = this.getAttribute('data-id');
+                retryModal.style.display = 'flex';
+            });
+        });
+
+        // Export Transactions
+        exportBtn.addEventListener('click', function() {
+            exportModal.style.display = 'flex';
+        });
+
+        // Close modals
+        closeViewModal.addEventListener('click', () => viewModal.style.display = 'none');
+        closeReceiptModal.addEventListener('click', () => receiptModal.style.display = 'none');
+        closeApproveModal.addEventListener('click', () => approveModal.style.display = 'none');
+        closeRetryModal.addEventListener('click', () => retryModal.style.display = 'none');
+        closeExportModal.addEventListener('click', () => exportModal.style.display = 'none');
+
+        closeViewModalBtn.addEventListener('click', () => viewModal.style.display = 'none');
+        closeReceiptBtn.addEventListener('click', () => receiptModal.style.display = 'none');
+        cancelApproveBtn.addEventListener('click', () => approveModal.style.display = 'none');
+        cancelRetryBtn.addEventListener('click', () => retryModal.style.display = 'none');
+        cancelExportBtn.addEventListener('click', () => exportModal.style.display = 'none');
+
+        // Click outside modal to close
+        window.addEventListener('click', (e) => {
+            if (e.target === viewModal) viewModal.style.display = 'none';
+            if (e.target === receiptModal) receiptModal.style.display = 'none';
+            if (e.target === approveModal) approveModal.style.display = 'none';
+            if (e.target === retryModal) retryModal.style.display = 'none';
+            if (e.target === exportModal) exportModal.style.display = 'none';
+        });
+
+        // Print receipt
+        printReceiptBtn.addEventListener('click', function() {
+            window.print();
+        });
+
+        // Confirm approve transaction
+        confirmApproveBtn.addEventListener('click', function() {
+            // Update the transaction status
+            transactions[currentTransactionId].status = 'completed';
+            
+            // Update the table row
+            const row = document.querySelector(`.approve-btn[data-id="${currentTransactionId}"]`).closest('tr');
+            row.setAttribute('data-status', 'completed');
+            row.querySelector('.status').className = 'status completed';
+            row.querySelector('.status').textContent = 'Completed';
+            
+            // Remove approve button and add receipt button
+            const approveBtn = row.querySelector('.approve-btn');
+            if (approveBtn) {
+                const receiptBtn = document.createElement('button');
+                receiptBtn.className = 'action-btn receipt-btn';
+                receiptBtn.title = 'Receipt';
+                receiptBtn.setAttribute('data-id', currentTransactionId);
+                receiptBtn.innerHTML = '<i class="fas fa-receipt"></i>';
+                receiptBtn.addEventListener('click', function() {
+                    currentTransactionId = this.getAttribute('data-id');
+                    const transaction = transactions[currentTransactionId];
+                    
+                    const receiptContent = document.getElementById('receiptContent');
+                    receiptContent.innerHTML = `
+                        <div class="receipt-row">
+                            <span>Receipt #:</span>
+                            <span>${transaction.id}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Date:</span>
+                            <span>${transaction.date}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>User:</span>
+                            <span>${transaction.user}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Type:</span>
+                            <span>${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Method:</span>
+                            <span>${transaction.method}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Reference:</span>
+                            <span>${transaction.reference}</span>
+                        </div>
+                        <div class="receipt-row total">
+                            <span>Amount:</span>
+                            <span class="${transaction.type === 'deposit' ? 'amount credit' : 'amount debit'}">${transaction.type === 'deposit' ? '+' : '-'}$${transaction.amount.toLocaleString()}</span>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Status:</span>
+                            <span class="status ${transaction.status}">${transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}</span>
+                        </div>
+                    `;
+                    
+                    receiptModal.style.display = 'flex';
+                });
+                
+                approveBtn.replaceWith(receiptBtn);
+            }
+            
+            approveModal.style.display = 'none';
+            alert('Transaction approved successfully!');
+        });
+
+        // Confirm retry transaction
+        confirmRetryBtn.addEventListener('click', function() {
+            // Update the transaction status to pending
+            transactions[currentTransactionId].status = 'pending';
+            
+            // Update the table row
+            const row = document.querySelector(`.retry-btn[data-id="${currentTransactionId}"]`).closest('tr');
+            row.setAttribute('data-status', 'pending');
+            row.querySelector('.status').className = 'status pending';
+            row.querySelector('.status').textContent = 'Pending';
+            
+            // Change retry button to approve button
+            const retryBtn = row.querySelector('.retry-btn');
+            if (retryBtn) {
+                const approveBtn = document.createElement('button');
+                approveBtn.className = 'action-btn approve-btn';
+                approveBtn.title = 'Approve';
+                approveBtn.setAttribute('data-id', currentTransactionId);
+                approveBtn.innerHTML = '<i class="fas fa-check"></i>';
+                approveBtn.addEventListener('click', function() {
+                    currentTransactionId = this.getAttribute('data-id');
+                    approveModal.style.display = 'flex';
+                });
+                
+                retryBtn.replaceWith(approveBtn);
+            }
+            
+            retryModal.style.display = 'none';
+            alert('Transaction retry initiated! Status changed to pending.');
+        });
+
+        // Confirm export
+        confirmExportBtn.addEventListener('click', function() {
+            const format = document.getElementById('exportFormat').value;
+            const selectedColumns = Array.from(document.getElementById('exportColumns').selectedOptions)
+                .map(option => option.value);
+            
+            // In a real app, this would generate and download the file
+            alert(`Exporting transactions as ${format.toUpperCase()} with columns: ${selectedColumns.join(', ')}`);
+            exportModal.style.display = 'none';
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function() {
+            filterTransactions();
+        });
+
+        // Filter functionality
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+
+        typeFilter.addEventListener('change', filterTransactions);
+        statusFilter.addEventListener('change', filterTransactions);
+        startDateInput.addEventListener('change', filterTransactions);
+        endDateInput.addEventListener('change', filterTransactions);
+
+        function filterTransactions() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const typeValue = typeFilter.value;
+            const statusValue = statusFilter.value;
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            endDate.setHours(23, 59, 59, 999); // Include entire end day
+
+            const rows = document.querySelectorAll('#transactionsBody tr');
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const rowType = row.getAttribute('data-type');
+                const rowStatus = row.getAttribute('data-status');
+                const rowDate = new Date(row.getAttribute('data-date'));
+
+                const matchesSearch = searchTerm === '' || rowText.includes(searchTerm);
+                const matchesType = typeValue === 'all' || rowType === typeValue;
+                const matchesStatus = statusValue === 'all' || rowStatus === statusValue;
+                const matchesDate = (!startDateInput.value || rowDate >= startDate) && 
+                                  (!endDateInput.value || rowDate <= endDate);
+
+                row.style.display = matchesSearch && matchesType && matchesStatus && matchesDate ? '' : 'none';
+            });
+        }
+
+        // Sorting functionality
+        const tableHeaders = document.querySelectorAll('th[data-sort]');
+        let currentSort = { column: 'date', direction: 'desc' };
+
+        tableHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const column = this.getAttribute('data-sort');
+                
+                if (currentSort.column === column) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.column = column;
+                    currentSort.direction = 'asc';
+                }
+                
+                sortTransactions();
+                updateSortIndicators();
+            });
+        });
+
+        function sortTransactions() {
+            const tbody = document.getElementById('transactionsBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch (currentSort.column) {
+                    case 'id':
+                        aValue = a.querySelector('td:first-child').textContent;
+                        bValue = b.querySelector('td:first-child').textContent;
+                        return currentSort.direction === 'asc' ? 
+                            aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    
+                    case 'user':
+                        aValue = a.querySelector('td:nth-child(2)').textContent;
+                        bValue = b.querySelector('td:nth-child(2)').textContent;
+                        return currentSort.direction === 'asc' ? 
+                            aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    
+                    case 'type':
+                        aValue = a.getAttribute('data-type');
+                        bValue = b.getAttribute('data-type');
+                        return currentSort.direction === 'asc' ? 
+                            aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    
+                    case 'amount':
+                        aValue = parseFloat(a.getAttribute('data-amount'));
+                        bValue = parseFloat(b.getAttribute('data-amount'));
+                        return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                    
+                    case 'date':
+                        aValue = new Date(a.getAttribute('data-date'));
+                        bValue = new Date(b.getAttribute('data-date'));
+                        return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                    
+                    case 'status':
+                        aValue = a.getAttribute('data-status');
+                        bValue = b.getAttribute('data-status');
+                        return currentSort.direction === 'asc' ? 
+                            aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    
+                    default:
+                        return 0;
+                }
+            });
+
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        function updateSortIndicators() {
+            tableHeaders.forEach(header => {
+                header.innerHTML = header.textContent;
+                if (header.getAttribute('data-sort') === currentSort.column) {
+                    const icon = document.createElement('i');
+                    icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'}`;
+                    icon.style.marginLeft = '5px';
+                    header.appendChild(icon);
+                }
+            });
+        }
+
+        // Initialize sort indicators
+        updateSortIndicators();
+
+        // Pagination
+        const pageButtons = document.querySelectorAll('.page-btn[data-page]');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        let currentPage = 1;
+
+        pageButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                currentPage = parseInt(this.getAttribute('data-page'));
+                updatePagination();
+            });
+        });
+
+        prevPageBtn.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+            }
+        });
+
+        nextPageBtn.addEventListener('click', function() {
+            if (currentPage < 3) { // Assuming 3 pages for demo
+                currentPage++;
+                updatePagination();
+            }
+        });
+
+        function updatePagination() {
+            // Update active page button
+            pageButtons.forEach(button => {
+                if (parseInt(button.getAttribute('data-page')) === currentPage) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            // In a real app, this would load the appropriate page of data
+            // For this demo, we'll just show an alert
+            console.log(`Loading page ${currentPage}`);
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Tradovate Admin</title>
+    <style>
+         :root {
+            --main-color: #00ffb7;
+            --bg-dark: #0e0e0e;
+            --bg-light: #ffffff;
+            --text-dark: #ffffff;
+            --text-light: #000000;
+            --card-dark: #1e1e1e;
+            --card-light: #f1f1f1;
+            --nav-width: 220px;
+            --nav-collapsed-width: 70px;
+            --transition-speed: 0.3s;
+            --border-dark: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(0, 0, 0, 0.1);
+            --input-bg-dark: rgba(255, 255, 255, 0.05);
+            --input-bg-light: rgba(0, 0, 0, 0.05);
+            --text-muted-dark: rgba(255, 255, 255, 0.7);
+            --text-muted-light: rgba(0, 0, 0, 0.7);
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Navigation - Identical to dashboard.html */
+        
+        nav {
+            width: var(--nav-width);
+            background-color: var(--card-dark);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 1rem;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            transition: width var(--transition-speed);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        nav.collapsed {
+            width: var(--nav-collapsed-width);
+        }
+        
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--main-color);
+            margin-bottom: 2rem;
+            white-space: nowrap;
+            transition: opacity var(--transition-speed);
+        }
+        
+        nav.collapsed .logo {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        nav .logo-icon {
+            display: none;
+            font-size: 1.8rem;
+            color: var(--main-color);
+            margin-bottom: 2rem;
+        }
+        
+        nav.collapsed .logo-icon {
+            display: block;
+        }
+        
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        nav ul li {
+            margin-bottom: 1rem;
+            white-space: nowrap;
+        }
+        
+        nav ul li a {
+            color: var(--text-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 5px;
+            transition: all var(--transition-speed);
+        }
+        
+        nav ul li a:hover {
+            background-color: var(--main-color);
+            color: #000;
+        }
+        
+        nav ul li a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            min-width: 20px;
+        }
+        
+        nav.collapsed ul li a span {
+            opacity: 0;
+            width: 0;
+            transition: opacity var(--transition-speed), width var(--transition-speed);
+        }
+        /* Main Content */
+        
+        .main {
+            margin-left: var(--nav-width);
+            width: calc(100% - var(--nav-width));
+            transition: margin-left var(--transition-speed);
+            padding-bottom: 2rem;
+        }
+        
+        .main.expanded {
+            margin-left: var(--nav-collapsed-width);
+        }
+        /* Header - Identical to dashboard.html */
+        
+        header {
+            background-color: var(--card-dark);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .toggle-nav {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .toggle-mode {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            background-color: var(--main-color);
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            font-weight: bold;
+            transition: all var(--transition-speed);
+        }
+        
+        .toggle-mode:hover {
+            transform: scale(1.05);
+        }
+        /* Content */
+        
+        .content {
+            padding: 1.5rem;
+        }
+        /* Settings Tabs */
+        
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+        }
+        
+        .tab-btn:hover {
+            color: var(--main-color);
+        }
+        
+        .tab-btn.active {
+            color: var(--main-color);
+            font-weight: 600;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--main-color);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Form Styles */
+        
+        .settings-form {
+            background-color: var(--card-dark);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 0 15px rgba(0, 255, 183, 0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .form-section-title {
+            color: var(--main-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-dark);
+            transition: border-color var(--transition-speed);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--main-color);
+        }
+        
+        .form-text {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .form-check-input {
+            margin-right: 0.75rem;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .form-check-label {
+            cursor: pointer;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--main-color);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        /* Toggle Switch */
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 0.75rem;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text-dark);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked+.slider {
+            background-color: var(--main-color);
+        }
+        
+        input:checked+.slider:before {
+            transform: translateX(26px);
+            background-color: #000;
+        }
+        /* Crypto Wallet Section */
+        
+        .crypto-wallets {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .crypto-wallet {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .crypto-wallet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .crypto-wallet-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .crypto-wallet-title {
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .crypto-wallet-status {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .crypto-wallet-qr {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        
+        .crypto-wallet-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        /* Modal for QR Code */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--card-dark);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 255, 183, 0.2);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--main-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--main-color);
+            border-bottom: 1px solid rgba(0, 255, 183, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .modal-body {
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .modal-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn-primary {
+            background-color: var(--main-color);
+            color: #000;
+        }
+        
+        .modal-btn-secondary {
+            background-color: transparent;
+            color: var(--text-dark);
+            border: 1px solid var(--text-dark);
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+        /* Mobile Menu Button - Identical to dashboard.html */
+        
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--main-color);
+            color: #000;
+            border: none;
+            font-size: 1.5rem;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        /* Responsive Design - Matches dashboard.html exactly */
+        
+        @media (max-width: 992px) {
+            nav {
+                width: var(--nav-collapsed-width);
+            }
+            nav .logo {
+                opacity: 0;
+            }
+            nav .logo-icon {
+                display: block;
+            }
+            nav ul li a span {
+                opacity: 0;
+                width: 0;
+            }
+            .main {
+                margin-left: var(--nav-collapsed-width);
+            }
+            .toggle-nav {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .settings-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 5px;
+            }
+            nav {
+                transform: translateX(-100%);
+                width: 250px;
+            }
+            nav.open {
+                transform: translateX(0);
+            }
+            nav .logo {
+                opacity: 1;
+            }
+            nav ul li a span {
+                opacity: 1;
+                width: auto;
+            }
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .crypto-wallets {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-left {
+                margin-bottom: 1rem;
+            }
+            .tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav id="sidebar">
+        <div class="logo">Tradovate</div>
+        <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+        <ul>
+            <li>
+                <a href="dashboard.html">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="users.html">
+                    <i class="fas fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="deposit.html">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Deposit</span>
+                </a>
+            </li>
+            <li>
+                <a href="withdrawal.html">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Withdrawals</span>
+                </a>
+            </li>
+            <li>
+                <a href="transactions.html">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
+            <li>
+                <a href="packages.html">
+                    <i class="fas fa-box-open"></i>
+                    <span>Packages</span>
+                </a>
+            </li>
+            <li>
+                <a href="logs.html">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Logs</span>
+                </a>
+            </li>
+            <li>
+                <a href="settings.html" class="active">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="admins.html">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admins</span>
+                </a>
+            </li>
+            <li>
+                <a href="support.html">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="main" id="main">
+        <header>
+            <div class="header-left">
+                <button class="toggle-nav" id="toggleNav">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2>System Settings</h2>
+            </div>
+            <button class="toggle-mode" onclick="toggleMode()">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </header>
+
+        <div class="content">
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-tab="general">General</button>
+                <button class="tab-btn" data-tab="payment">Payment</button>
+                <button class="tab-btn" data-tab="security">Security</button>
+                <button class="tab-btn" data-tab="notifications">Notifications</button>
+                <button class="tab-btn" data-tab="maintenance">Maintenance</button>
+            </div>
+
+            <!-- General Settings Tab -->
+            <div class="tab-content active" id="general">
+                <form class="settings-form" id="generalSettingsForm">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Site Information</h3>
+                        <div class="form-group">
+                            <label for="siteName">Site Name</label>
+                            <input type="text" id="siteName" class="form-control" value="Tradovate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="siteLogo">Site Logo</label>
+                            <input type="file" id="siteLogo" class="form-control" accept="image/*">
+                            <p class="form-text">Recommended size: 200x50 pixels</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="siteFavicon">Favicon</label>
+                            <input type="file" id="siteFavicon" class="form-control" accept="image/x-icon">
+                            <p class="form-text">.ico format, 32x32 pixels</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Appearance</h3>
+                        <div class="form-group">
+                            <label for="primaryColor">Primary Color</label>
+                            <input type="color" id="primaryColor" class="form-control" value="#00ffb7">
+                        </div>
+                        <div class="form-group">
+                            <label for="defaultTheme">Default Theme</label>
+                            <select id="defaultTheme" class="form-control">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                                <option value="system">System Preference</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="resetGeneralSettings()">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Payment Settings Tab -->
+            <div class="tab-content" id="payment">
+                <form class="settings-form" id="paymentSettingsForm">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Payment Gateways</h3>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="enablePaystack" class="form-check-input" checked>
+                                <label for="enablePaystack" class="form-check-label">Enable Paystack</label>
+                            </div>
+                            <div class="form-group" id="paystackFields" style="margin-left: 2rem; margin-top: 1rem;">
+                                <label for="paystackPublicKey">Public Key</label>
+                                <input type="text" id="paystackPublicKey" class="form-control" placeholder="pk_test_xxxxxxxx">
+                                <label for="paystackSecretKey" style="margin-top: 1rem;">Secret Key</label>
+                                <input type="password" id="paystackSecretKey" class="form-control" placeholder="sk_test_xxxxxxxx">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="enableFlutterwave" class="form-check-input">
+                                <label for="enableFlutterwave" class="form-check-label">Enable Flutterwave</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Withdrawal Settings</h3>
+                        <div class="form-group">
+                            <label for="minWithdrawal">Minimum Withdrawal Amount ($)</label>
+                            <input type="number" id="minWithdrawal" class="form-control" value="100" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="withdrawalFee">Withdrawal Fee (%)</label>
+                            <input type="number" id="withdrawalFee" class="form-control" value="1.5" min="0" max="10" step="0.1">
+                        </div>
+                    </div>
+
+                    <!-- New Crypto Wallet Section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">Cryptocurrency Wallets</h3>
+                        <p class="form-text">Configure wallet addresses for cryptocurrency deposits</p>
+
+                        <div class="crypto-wallets">
+                            <!-- USDT Wallet -->
+                            <div class="crypto-wallet">
+                                <div class="crypto-wallet-header">
+                                    <div class="crypto-wallet-icon">
+                                        <i class="fab fa-ethereum"></i>
+                                    </div>
+                                    <h4 class="crypto-wallet-title">USDT (ERC-20)</h4>
+                                    <div class="crypto-wallet-status">
+                                        <label class="switch">
+                                            <input type="checkbox" id="enableUSDT" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="usdtAddress">Wallet Address</label>
+                                    <input type="text" id="usdtAddress" class="form-control" placeholder="0x...">
+                                </div>
+                                <div class="form-group">
+                                    <label>QR Code</label>
+                                    <input type="file" id="usdtQrCode" class="form-control" accept="image/*">
+                                    <p class="form-text">Upload a QR code image for USDT deposits</p>
+                                    <div class="crypto-wallet-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="viewQrCode('USDT')">
+                                            <i class="fas fa-eye"></i> View QR
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="generateQrCode('USDT')">
+                                            <i class="fas fa-qrcode"></i> Generate QR
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- USDC Wallet -->
+                            <div class="crypto-wallet">
+                                <div class="crypto-wallet-header">
+                                    <div class="crypto-wallet-icon">
+                                        <i class="fab fa-ethereum"></i>
+                                    </div>
+                                    <h4 class="crypto-wallet-title">USDC (ERC-20)</h4>
+                                    <div class="crypto-wallet-status">
+                                        <label class="switch">
+                                            <input type="checkbox" id="enableUSDC" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="usdcAddress">Wallet Address</label>
+                                    <input type="text" id="usdcAddress" class="form-control" placeholder="0x...">
+                                </div>
+                                <div class="form-group">
+                                    <label>QR Code</label>
+                                    <input type="file" id="usdcQrCode" class="form-control" accept="image/*">
+                                    <p class="form-text">Upload a QR code image for USDC deposits</p>
+                                    <div class="crypto-wallet-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="viewQrCode('USDC')">
+                                            <i class="fas fa-eye"></i> View QR
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="generateQrCode('USDC')">
+                                            <i class="fas fa-qrcode"></i> Generate QR
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ETH Wallet -->
+                            <div class="crypto-wallet">
+                                <div class="crypto-wallet-header">
+                                    <div class="crypto-wallet-icon">
+                                        <i class="fab fa-ethereum"></i>
+                                    </div>
+                                    <h4 class="crypto-wallet-title">Ethereum (ETH)</h4>
+                                    <div class="crypto-wallet-status">
+                                        <label class="switch">
+                                            <input type="checkbox" id="enableETH" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ethAddress">Wallet Address</label>
+                                    <input type="text" id="ethAddress" class="form-control" placeholder="0x...">
+                                </div>
+                                <div class="form-group">
+                                    <label>QR Code</label>
+                                    <input type="file" id="ethQrCode" class="form-control" accept="image/*">
+                                    <p class="form-text">Upload a QR code image for ETH deposits</p>
+                                    <div class="crypto-wallet-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="viewQrCode('ETH')">
+                                            <i class="fas fa-eye"></i> View QR
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="generateQrCode('ETH')">
+                                            <i class="fas fa-qrcode"></i> Generate QR
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BTC Wallet -->
+                            <div class="crypto-wallet">
+                                <div class="crypto-wallet-header">
+                                    <div class="crypto-wallet-icon">
+                                        <i class="fab fa-bitcoin"></i>
+                                    </div>
+                                    <h4 class="crypto-wallet-title">Bitcoin (BTC)</h4>
+                                    <div class="crypto-wallet-status">
+                                        <label class="switch">
+                                            <input type="checkbox" id="enableBTC" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="btcAddress">Wallet Address</label>
+                                    <input type="text" id="btcAddress" class="form-control" placeholder="bc1...">
+                                </div>
+                                <div class="form-group">
+                                    <label>QR Code</label>
+                                    <input type="file" id="btcQrCode" class="form-control" accept="image/*">
+                                    <p class="form-text">Upload a QR code image for BTC deposits</p>
+                                    <div class="crypto-wallet-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="viewQrCode('BTC')">
+                                            <i class="fas fa-eye"></i> View QR
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="generateQrCode('BTC')">
+                                            <i class="fas fa-qrcode"></i> Generate QR
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Security Settings Tab -->
+            <div class="tab-content" id="security">
+                <form class="settings-form" id="securitySettingsForm">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Authentication</h3>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="enable2FA" class="form-check-input" checked>
+                                <label for="enable2FA" class="form-check-label">Enable Two-Factor Authentication for Admins</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="requireStrongPasswords" class="form-check-input" checked>
+                                <label for="requireStrongPasswords" class="form-check-label">Require Strong Passwords</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="failedLoginAttempts">Max Failed Login Attempts</label>
+                            <input type="number" id="failedLoginAttempts" class="form-control" value="5" min="1" max="10">
+                            <p class="form-text">Account will be locked after exceeding this number</p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Security Headers</h3>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="enableCSP" class="form-check-input">
+                                <label for="enableCSP" class="form-check-label">Enable Content Security Policy</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="enableHSTS" class="form-check-input" checked>
+                                <label for="enableHSTS" class="form-check-label">Enable HSTS (HTTP Strict Transport Security)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Notifications Settings Tab -->
+            <div class="tab-content" id="notifications">
+                <form class="settings-form" id="notificationSettingsForm">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Email Notifications</h3>
+                        <div class="form-group">
+                            <label for="smtpHost">SMTP Host</label>
+                            <input type="text" id="smtpHost" class="form-control" placeholder="smtp.example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtpPort">SMTP Port</label>
+                            <input type="number" id="smtpPort" class="form-control" placeholder="587">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtpUsername">SMTP Username</label>
+                            <input type="text" id="smtpUsername" class="form-control" placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="smtpPassword">SMTP Password</label>
+                            <input type="password" id="smtpPassword" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="smtpSecure" class="form-check-input" checked>
+                                <label for="smtpSecure" class="form-check-label">Use TLS/SSL</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Notification Types</h3>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="notifyNewUser" class="form-check-input" checked>
+                                <label for="notifyNewUser" class="form-check-label">New User Registration</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="notifyDeposit" class="form-check-input" checked>
+                                <label for="notifyDeposit" class="form-check-label">Deposit Notifications</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="notifyWithdrawal" class="form-check-input" checked>
+                                <label for="notifyWithdrawal" class="form-check-label">Withdrawal Requests</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Maintenance Settings Tab -->
+            <div class="tab-content" id="maintenance">
+                <form class="settings-form" id="maintenanceSettingsForm">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Maintenance Mode</h3>
+                        <div class="form-group">
+                            <div class="form-check" style="align-items: center;">
+                                <label class="switch">
+                                    <input type="checkbox" id="maintenanceMode">
+                                    <span class="slider"></span>
+                                </label>
+                                <label for="maintenanceMode" class="form-check-label" style="margin-left: 0.5rem;">Enable Maintenance Mode</label>
+                            </div>
+                            <p class="form-text">When enabled, only admins can access the site</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="maintenanceMessage">Maintenance Message</label>
+                            <textarea id="maintenanceMessage" class="form-control" rows="3">We're currently performing scheduled maintenance. Please check back later.</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Backup & Restore</h3>
+                        <div class="form-group">
+                            <label>Database Backup</label>
+                            <button type="button" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                                <i class="fas fa-download"></i> Download Backup
+                            </button>
+                            <p class="form-text">Last backup: 2023-12-10 02:00 AM</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="restoreBackup">Restore Backup</label>
+                            <input type="file" id="restoreBackup" class="form-control">
+                            <p class="form-text">Upload a previously saved backup file</p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal" id="qrCodeModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeQrModal">&times;</button>
+            <h3 class="modal-title" id="qrModalTitle">QR Code</h3>
+            <div class="modal-body">
+                <div id="qrCodeDisplay" style="text-align: center;">
+                    <!-- QR code will be displayed here -->
+                    <img id="qrCodeImage" src="" alt="QR Code" style="max-width: 100%; max-height: 300px;">
+                    <p id="qrAddress" style="word-break: break-all; margin-top: 1rem;"></p>
+                </div>
+                <div id="qrCodeGenerator" style="display: none; margin-top: 1rem;">
+                    <div class="form-group">
+                        <label for="qrCodeText">Wallet Address</label>
+                        <input type="text" id="qrCodeText" class="form-control" placeholder="Enter wallet address">
+                    </div>
+                    <div class="form-group">
+                        <label for="qrCodeSize">QR Code Size</label>
+                        <select id="qrCodeSize" class="form-control">
+                            <option value="100">100x100</option>
+                            <option value="150">150x150</option>
+                            <option value="200" selected>200x200</option>
+                            <option value="250">250x250</option>
+                            <option value="300">300x300</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="createQrCode()">
+                        <i class="fas fa-qrcode"></i> Generate QR Code
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-secondary" id="downloadQrBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button type="button" class="modal-btn modal-btn-primary" id="closeQrBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons and contents
+                document.querySelectorAll('.tab-btn, .tab-content').forEach(el => {
+                    el.classList.remove('active');
+                });
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Toggle Paystack fields visibility
+        document.getElementById('enablePaystack').addEventListener('change', function() {
+            document.getElementById('paystackFields').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Form submission handlers
+        document.getElementById('generalSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('General settings saved successfully!');
+            // Here you would normally send the data to your backend
+        });
+
+        document.getElementById('paymentSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Save crypto wallet settings
+            const cryptoWallets = {
+                USDT: {
+                    enabled: document.getElementById('enableUSDT').checked,
+                    address: document.getElementById('usdtAddress').value,
+                    qrCode: document.getElementById('usdtQrCode').files[0] ?
+                        URL.createObjectURL(document.getElementById('usdtQrCode').files[0]) : ''
+                },
+                USDC: {
+                    enabled: document.getElementById('enableUSDC').checked,
+                    address: document.getElementById('usdcAddress').value,
+                    qrCode: document.getElementById('usdcQrCode').files[0] ?
+                        URL.createObjectURL(document.getElementById('usdcQrCode').files[0]) : ''
+                },
+                ETH: {
+                    enabled: document.getElementById('enableETH').checked,
+                    address: document.getElementById('ethAddress').value,
+                    qrCode: document.getElementById('ethQrCode').files[0] ?
+                        URL.createObjectURL(document.getElementById('ethQrCode').files[0]) : ''
+                },
+                BTC: {
+                    enabled: document.getElementById('enableBTC').checked,
+                    address: document.getElementById('btcAddress').value,
+                    qrCode: document.getElementById('btcQrCode').files[0] ?
+                        URL.createObjectURL(document.getElementById('btcQrCode').files[0]) : ''
+                }
+            };
+
+            // In a real app, you would send this to your backend
+            console.log('Crypto wallets:', cryptoWallets);
+            alert('Payment settings saved successfully!');
+        });
+
+        document.getElementById('securitySettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Security settings saved successfully!');
+        });
+
+        document.getElementById('notificationSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Notification settings saved successfully!');
+        });
+
+        document.getElementById('maintenanceSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Maintenance settings saved successfully!');
+        });
+
+        // Reset general settings
+        function resetGeneralSettings() {
+            if (confirm('Are you sure you want to reset all general settings to default?')) {
+                document.getElementById('siteName').value = 'Tradovate';
+                document.getElementById('primaryColor').value = '#00ffb7';
+                document.getElementById('defaultTheme').value = 'dark';
+                alert('General settings have been reset to defaults');
+            }
+        }
+
+        // QR Code Modal functionality
+        const qrCodeModal = document.getElementById('qrCodeModal');
+        const closeQrModal = document.getElementById('closeQrModal');
+        const closeQrBtn = document.getElementById('closeQrBtn');
+        const downloadQrBtn = document.getElementById('downloadQrBtn');
+        let currentCryptoType = '';
+
+        function viewQrCode(cryptoType) {
+            currentCryptoType = cryptoType;
+            document.getElementById('qrModalTitle').textContent = `${cryptoType} QR Code`;
+            document.getElementById('qrCodeDisplay').style.display = 'block';
+            document.getElementById('qrCodeGenerator').style.display = 'none';
+
+            // In a real app, you would fetch the saved QR code image
+            const address = document.getElementById(`${cryptoType.toLowerCase()}Address`).value;
+            document.getElementById('qrAddress').textContent = address || 'No address set';
+
+            // For demo purposes, we'll use a placeholder
+            document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(address || 'https://example.com')}`;
+
+            qrCodeModal.style.display = 'flex';
+        }
+
+        function generateQrCode(cryptoType) {
+            currentCryptoType = cryptoType;
+            document.getElementById('qrModalTitle').textContent = `Generate ${cryptoType} QR Code`;
+            document.getElementById('qrCodeDisplay').style.display = 'none';
+            document.getElementById('qrCodeGenerator').style.display = 'block';
+
+            // Pre-fill the address if it exists
+            const address = document.getElementById(`${cryptoType.toLowerCase()}Address`).value;
+            document.getElementById('qrCodeText').value = address;
+
+            qrCodeModal.style.display = 'flex';
+        }
+
+        function createQrCode() {
+            const text = document.getElementById('qrCodeText').value;
+            const size = document.getElementById('qrCodeSize').value;
+
+            if (!text) {
+                alert('Please enter a wallet address');
+                return;
+            }
+
+            // Update the address field
+            document.getElementById(`${currentCryptoType.toLowerCase()}Address`).value = text;
+
+            // Show the generated QR code
+            document.getElementById('qrModalTitle').textContent = `${currentCryptoType} QR Code`;
+            document.getElementById('qrCodeDisplay').style.display = 'block';
+            document.getElementById('qrCodeGenerator').style.display = 'none';
+            document.getElementById('qrAddress').textContent = text;
+            document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
+        }
+
+        // Download QR code
+        downloadQrBtn.addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.href = document.getElementById('qrCodeImage').src;
+            link.download = `${currentCryptoType}-wallet-qr.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Close QR modal
+        closeQrModal.addEventListener('click', () => qrCodeModal.style.display = 'none');
+        closeQrBtn.addEventListener('click', () => qrCodeModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === qrCodeModal) qrCodeModal.style.display = 'none';
+        });
+
+        // Dark/Light Mode Toggle - Identical to dashboard.html
+        let darkMode = true;
+
+        function toggleMode() {
+            darkMode = !darkMode;
+            document.body.style.backgroundColor = darkMode ? 'var(--bg-dark)' : 'var(--bg-light)';
+            document.body.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
+
+            document.querySelectorAll('nav, .settings-form, header, .form-control, .tab-btn').forEach(el => {
+                el.style.backgroundColor = darkMode ? 'var(--card-dark)' : 'var(--card-light)';
+                el.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
+            });
+
+            document.querySelectorAll('nav ul li a').forEach(link => {
+                link.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
+            });
+
+            const modeIcon = document.querySelector('.toggle-mode i');
+            const modeText = document.querySelector('.toggle-mode');
+
+            if (darkMode) {
+                modeIcon.className = 'fas fa-moon';
+                modeText.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            } else {
+                modeIcon.className = 'fas fa-sun';
+                modeText.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            }
+        }
+
+        // Sidebar Toggle - Identical to dashboard.html
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const toggleNav = document.getElementById('toggleNav');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+        }
+
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('open');
+        }
+
+        toggleNav.addEventListener('click', toggleSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Auto-collapse sidebar on mobile - Identical to dashboard.html
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                main.classList.remove('expanded');
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Run on initial load
+
+        // Load saved crypto wallet settings (demo purposes)
+        document.addEventListener('DOMContentLoaded', function() {
+            // In a real app, you would load these from your backend
+            const demoWallets = {
+                USDT: {
+                    enabled: true,
+                    address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
+                },
+                USDC: {
+                    enabled: true,
+                    address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+                },
+                ETH: {
+                    enabled: true,
+                    address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
+                },
+                BTC: {
+                    enabled: true,
+                    address: 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq'
+                }
+            };
+
+            // Set the demo values
+            for (const [crypto, data] of Object.entries(demoWallets)) {
+                document.getElementById(`enable${crypto}`).checked = data.enabled;
+                document.getElementById(`${crypto.toLowerCase()}Address`).value = data.address;
+            }
+        });
+    </script>
+</body>
+
+</html>
